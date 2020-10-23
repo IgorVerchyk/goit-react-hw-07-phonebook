@@ -7,14 +7,14 @@ import PropTypes from 'prop-types';
 
 import styles from './Contacts.module.css';
 import fade from './fade.module.css';
-import contactActions from '../redux/contacts/contactActions';
+import contactSelectors from '../redux/contacts/contactSelectors';
 
-const ContactList = ({ contacts, onDelete }) => {
+const ContactList = ({ contacts }) => {
   return (
     <TransitionGroup component="ul" className={styles.list}>
       {contacts.map(({ id, ...contact }) => (
         <CSSTransition key={id} timeout={250} classNames={fade}>
-          <ContactItem id={id} {...contact} onDelete={() => onDelete(id)} />
+          <ContactItem id={id} />
         </CSSTransition>
       ))}
     </TransitionGroup>
@@ -32,16 +32,10 @@ ContactList.propTypes = {
     ),
     PropTypes.array,
   ]),
-  onDelete: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-  contacts: state.phonebook.contacts.filter(item =>
-    item.name.toLowerCase().includes(state.phonebook.filter),
-  ),
+  contacts: contactSelectors.getVisibleContacts(state),
 });
 
-const mapDispatchToProps = {
-  onDelete: contactActions.deleteContact,
-};
-export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
+export default connect(mapStateToProps)(ContactList);

@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import styles from './Contacts.module.css';
+import contactOperations from '../redux/contacts/contactOperations';
+import contactSelectors from '../redux/contacts/contactSelectors';
 
-export default function ContactItem({ name, number, onDelete }) {
+import styles from './Contacts.module.css';
+import { connect } from 'react-redux';
+
+function ContactItem({ name, number, onDelete }) {
   return (
     <li className={styles.listItem}>
       <p className={styles.contact}>
@@ -17,7 +21,16 @@ export default function ContactItem({ name, number, onDelete }) {
 }
 
 ContactItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
+  name: PropTypes.string,
+  number: PropTypes.string,
   onDelete: PropTypes.func.isRequired,
 };
+
+const mapStateToProps = (state, props) => {
+  const contact = contactSelectors.getContactsById(state, props.id);
+  return { ...contact };
+};
+const mapDispatchToProps = (dispatch, props) => ({
+  onDelete: () => dispatch(contactOperations.deleteContact(props.id)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);
